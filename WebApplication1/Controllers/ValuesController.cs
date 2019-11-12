@@ -127,7 +127,7 @@ namespace WebApplication1.Controllers
 
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
     }
