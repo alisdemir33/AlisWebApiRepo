@@ -87,6 +87,7 @@ namespace WebApplication1.Controllers
         public HttpResponseMessage GetVakifListByPagedList(int pageNumber = 1, int pageSize = 10, string cityFilter = "", string foundationFilter = "")
 
         {
+            //sdfsdf
             try
             {
                 using (CONTOSOEntities db = new CONTOSOEntities())
