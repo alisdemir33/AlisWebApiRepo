@@ -1,7 +1,9 @@
-﻿using JWTSample.Models;
+﻿using JWTSample.Entities;
+using JWTSample.Models;
 using JWTSample.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace JWTSample.Controllers
 {
@@ -19,7 +21,7 @@ namespace JWTSample.Controllers
         //Burada da AllowAnonymous attribute nü kullanarak bu seferde bu metoda herkesin erişebileceğini söylüyorum.
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Authenticate([FromBody]AuthenticateModel authenticateModel)
+        public IActionResult Authenticate([FromBody] AuthenticateModel authenticateModel)
         {
             var user = _userService.Authenticate(authenticateModel.Username, authenticateModel.Password);
 
@@ -31,5 +33,19 @@ namespace JWTSample.Controllers
 
         [HttpGet]
         public IActionResult GetSummaries() => Ok(Summaries);
+
+
+        [HttpGet]
+        public IActionResult GetAcik()
+            {
+
+            JwtTestDBContext jwtTestDBContext = new JwtTestDBContext();
+            AçıkKapıSosyalHizmetBaş1 item = jwtTestDBContext.AçıkKapıSosyalHizmetBaş1.FirstOrDefault();
+
+            return Ok(item);
+            }
+           
+
+
     }
 }
