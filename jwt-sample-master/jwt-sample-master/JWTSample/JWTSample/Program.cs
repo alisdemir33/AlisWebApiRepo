@@ -18,3 +18,8 @@ namespace JWTSample
                 });
     }
 }
+
+//{
+//    "username":"userName",
+//    "password":"testPassword"
+//}
