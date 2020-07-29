@@ -3,6 +3,7 @@ using JWTSample.Models;
 using JWTSample.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace JWTSample.Controllers
@@ -36,16 +37,29 @@ namespace JWTSample.Controllers
 
 
         [HttpGet]
-        public IActionResult GetAcik()
-            {
-
-            JwtTestDBContext jwtTestDBContext = new JwtTestDBContext();
-            AçıkKapıSosyalHizmetBaş1 item = jwtTestDBContext.AçıkKapıSosyalHizmetBaş1.FirstOrDefault();
-
+        public IActionResult GetAcikKapiBasvuru()
+        {
+            AçıkKapıSosyalHizmetBaş1 item = _userService.getBasvuruByID(3);
             return Ok(item);
-            }
-           
+        }
 
+        [HttpGet]
+        public IActionResult GetUserList()
+        {
+            List<Users> items = _userService.getUserList();
+            return Ok(items);
+        }
 
+        [HttpGet]
+        public IActionResult GetIngredients()
+        {            
+            return Ok(_userService.GetIngredients());
+        }
+
+        [HttpGet]
+        public IActionResult GetOrders()
+        {
+            return Ok(_userService.GetOrders());
+        }
     }
 }

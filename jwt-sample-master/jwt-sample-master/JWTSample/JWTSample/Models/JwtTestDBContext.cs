@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
 namespace JWTSample.Models
 {
@@ -22,27 +21,12 @@ namespace JWTSample.Models
         public virtual DbSet<Province> Province { get; set; }
         public virtual DbSet<Users> Users { get; set; }
 
-        /*
-         
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-         */
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-           .AddJsonFile("appsettings.json")
-           .Build();
-
-                optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("data source=10.0.201.181;initial catalog=AliDemirozTest;integrated security=True;MultipleActiveResultSets=True;");
             }
         }
 
@@ -51,45 +35,13 @@ namespace JWTSample.Models
             modelBuilder.Entity<AçıkKapıSosyalHizmetBaş1>(entity =>
             {
                 entity.HasNoKey();
-
-                entity.ToTable("'Açık Kapı Sosyal Hizmet Baş_1$'");
-
-                entity.Property(e => e.Adı).HasMaxLength(255);
-
-                entity.Property(e => e.BasvuruKonu).HasMaxLength(255);
-
-                entity.Property(e => e.BasvuruTarihi).HasColumnType("datetime");
-
-                entity.Property(e => e.CepTelNo)
-                    .HasColumnName("Cep Tel#No")
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.Soyadı).HasMaxLength(255);
-
-                entity.Property(e => e.TcKimlikNo)
-                    .HasColumnName("TC Kimlik No")
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.İl).HasMaxLength(255);
-
-                entity.Property(e => e.İlçe).HasMaxLength(255);
             });
 
             modelBuilder.Entity<County>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.CountyName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+                entity.Property(e => e.CountyName).IsUnicode(false);
 
                 entity.HasOne(d => d.Province)
                     .WithMany(p => p.County)
@@ -100,34 +52,15 @@ namespace JWTSample.Models
 
             modelBuilder.Entity<Foundation>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Address).IsUnicode(false);
 
-                entity.Property(e => e.Address)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Email).IsUnicode(false);
 
-                entity.Property(e => e.CountyId).HasColumnName("CountyID");
+                entity.Property(e => e.Fax).IsUnicode(false);
 
-                entity.Property(e => e.Email)
-                    .HasColumnName("EMail")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Fname).IsUnicode(false);
 
-                entity.Property(e => e.Fax)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Fname)
-                    .IsRequired()
-                    .HasColumnName("FName")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Phone)
-                    .HasMaxLength(15)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+                entity.Property(e => e.Phone).IsUnicode(false);
 
                 entity.HasOne(d => d.County)
                     .WithMany(p => p.Foundation)
@@ -144,30 +77,18 @@ namespace JWTSample.Models
 
             modelBuilder.Entity<Province>(entity =>
             {
-                entity.Property(e => e.ProvinceId)
-                    .HasColumnName("ProvinceID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.ProvinceId).ValueGeneratedNever();
 
-                entity.Property(e => e.ProvinceName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.ProvinceName).IsUnicode(false);
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Password).IsUnicode(false);
 
-                entity.Property(e => e.UserName)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.UserName).IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
