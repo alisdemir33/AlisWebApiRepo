@@ -26,6 +26,7 @@ namespace JWTSample.ContosoModels
         public virtual DbSet<OfficeAssignment> OfficeAssignment { get; set; }
         public virtual DbSet<Province> Province { get; set; }
         public virtual DbSet<Student> Student { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -40,15 +41,9 @@ namespace JWTSample.ContosoModels
         {
             modelBuilder.Entity<County>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.CountyName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+                entity.Property(e => e.CountyName).IsUnicode(false);
 
                 entity.HasOne(d => d.Province)
                     .WithMany(p => p.County)
@@ -59,13 +54,7 @@ namespace JWTSample.ContosoModels
 
             modelBuilder.Entity<Course>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-
-                entity.Property(e => e.Title).HasMaxLength(50);
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Course)
@@ -84,10 +73,6 @@ namespace JWTSample.ContosoModels
                 entity.HasIndex(e => e.InstructorId)
                     .HasName("IX_InstructorID");
 
-                entity.Property(e => e.CourseId).HasColumnName("CourseID");
-
-                entity.Property(e => e.InstructorId).HasColumnName("InstructorID");
-
                 entity.HasOne(d => d.Course)
                     .WithMany(p => p.CourseInstructor)
                     .HasForeignKey(d => d.CourseId)
@@ -105,22 +90,11 @@ namespace JWTSample.ContosoModels
                 entity.HasIndex(e => e.InstructorId)
                     .HasName("IX_InstructorID");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Budget).HasColumnType("money");
-
-                entity.Property(e => e.InstructorId).HasColumnName("InstructorID");
-
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.RowVersion)
-                    .IsRequired()
                     .IsRowVersion()
                     .IsConcurrencyToken();
-
-                entity.Property(e => e.StartDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Instructor)
                     .WithMany(p => p.Department)
@@ -136,13 +110,7 @@ namespace JWTSample.ContosoModels
                 entity.HasIndex(e => e.StudentId)
                     .HasName("IX_StudentID");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.CourseId).HasColumnName("CourseID");
-
-                entity.Property(e => e.StudentId).HasColumnName("StudentID");
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.HasOne(d => d.Course)
                     .WithMany(p => p.Enrollment)
@@ -163,34 +131,15 @@ namespace JWTSample.ContosoModels
 
             modelBuilder.Entity<Foundation>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Address).IsUnicode(false);
 
-                entity.Property(e => e.Address)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Email).IsUnicode(false);
 
-                entity.Property(e => e.CountyId).HasColumnName("CountyID");
+                entity.Property(e => e.Fax).IsUnicode(false);
 
-                entity.Property(e => e.Email)
-                    .HasColumnName("EMail")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Fname).IsUnicode(false);
 
-                entity.Property(e => e.Fax)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Fname)
-                    .IsRequired()
-                    .HasColumnName("FName")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Phone)
-                    .HasMaxLength(15)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
+                entity.Property(e => e.Phone).IsUnicode(false);
 
                 entity.HasOne(d => d.County)
                     .WithMany(p => p.Foundation)
@@ -207,24 +156,9 @@ namespace JWTSample.ContosoModels
 
             modelBuilder.Entity<Instructor>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Discriminator)
-                    .IsRequired()
-                    .HasMaxLength(128)
-                    .HasDefaultValueSql("('Instructor')");
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.HireDate).HasColumnType("datetime");
-
-                entity.Property(e => e.LastName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.Discriminator).HasDefaultValueSql("('Instructor')");
 
                 entity.HasOne(d => d.IdNavigation)
                     .WithOne(p => p.Instructor)
@@ -237,18 +171,6 @@ namespace JWTSample.ContosoModels
             {
                 entity.HasKey(e => new { e.MigrationId, e.ContextKey })
                     .HasName("PK_dbo.__MigrationHistory");
-
-                entity.ToTable("__MigrationHistory");
-
-                entity.Property(e => e.MigrationId).HasMaxLength(150);
-
-                entity.Property(e => e.ContextKey).HasMaxLength(300);
-
-                entity.Property(e => e.Model).IsRequired();
-
-                entity.Property(e => e.ProductVersion)
-                    .IsRequired()
-                    .HasMaxLength(32);
             });
 
             modelBuilder.Entity<OfficeAssignment>(entity =>
@@ -259,43 +181,24 @@ namespace JWTSample.ContosoModels
                 entity.HasIndex(e => e.InstructorId)
                     .HasName("IX_InstructorID");
 
-                entity.Property(e => e.InstructorId)
-                    .HasColumnName("InstructorID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Location).HasMaxLength(50);
+                entity.Property(e => e.InstructorId).ValueGeneratedNever();
             });
 
             modelBuilder.Entity<Province>(entity =>
             {
-                entity.Property(e => e.ProvinceId)
-                    .HasColumnName("ProvinceID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.ProvinceId).ValueGeneratedNever();
 
-                entity.Property(e => e.ProvinceName)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.ProvinceName).IsUnicode(false);
             });
 
             modelBuilder.Entity<Student>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
 
-                entity.Property(e => e.EnrollmentDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Explanation)
-                    .IsRequired()
-                    .HasMaxLength(128);
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.LastName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.HasNoKey();
             });
 
             OnModelCreatingPartial(modelBuilder);

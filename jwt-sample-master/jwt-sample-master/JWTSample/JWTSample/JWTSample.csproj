@@ -5,6 +5,7 @@
     <UserSecretsId>5ab16a3d-6afd-43e7-90c3-1257d2d1d328</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <StartupObject>JWTSample.Program</StartupObject>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
 
   <ItemGroup>

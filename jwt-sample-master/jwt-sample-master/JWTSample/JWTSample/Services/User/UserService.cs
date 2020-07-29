@@ -11,6 +11,8 @@ using JWTSample.Models;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Collections.Generic;
 using JWTSample.ViewModels;
+using JWTSample.ContosoModels;
+//using Users = JWTSample.ContosoModels.Users;
 
 namespace JWTSample.Services.User
 {
@@ -19,7 +21,9 @@ namespace JWTSample.Services.User
     {
         private readonly AppSettings _appSettings;
         private readonly JwtTestDBContext _dbContext;
+       // private readonly CONTOSOContext _dbContext;
         public UserService(IOptions<AppSettings> appSettings, JwtTestDBContext dbContext)
+     //   public UserService(IOptions<AppSettings> appSettings, CONTOSOContext dbContext)
         {
             _dbContext = dbContext;
             _appSettings = appSettings.Value;
@@ -60,26 +64,21 @@ namespace JWTSample.Services.User
             //Oluşturduğumuz tokenı string olarak bir değişkene atıyoruz.
             string generatedToken = tokenHandler.WriteToken(token);
 
-            //Sonuçlarımızı tuple olarak dönüyoruz.
-            return (user.UserName, generatedToken);
+           // Sonuçlarımızı tuple olarak dönüyoruz.
+              return (user.UserName, generatedToken);
+            // return ("", "");
         }
-
-        public AçıkKapıSosyalHizmetBaş1 getBasvuruByID(long id)
-        {
-            AçıkKapıSosyalHizmetBaş1 item = _dbContext.AçıkKapıSosyalHizmetBaş1.Where(item => item.Id == id.ToString()).FirstOrDefault();
-            return item;
-        }
-
 
         public Ingredients GetIngredients()
         {
             return new Ingredients() { Bacon = 0, Meat = 0, Cheese = 0, Salad = 0 };
         }
 
-        public List<Users> getUserList()
+        public List<Models.Users> getUserList()
         {
-            List<Users> items = _dbContext.Users.ToList();// AçıkKapıSosyalHizmetBaş1.Where(item => item.Id == id.ToString()).FirstOrDefault();
+            List<Models.Users> items = _dbContext.Users.ToList();// AçıkKapıSosyalHizmetBaş1.Where(item => item.Id == id.ToString()).FirstOrDefault();
             return items;
+          
         }
 
         public List<Order> GetOrders()

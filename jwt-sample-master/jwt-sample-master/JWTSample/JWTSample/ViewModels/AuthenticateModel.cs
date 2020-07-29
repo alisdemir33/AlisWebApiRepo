@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace JWTSample.Models
+namespace JWTSample
 {
     //Authenticate işleminde neler geleceğini ve validasyonları için oluşturdum.
     public class AuthenticateModel

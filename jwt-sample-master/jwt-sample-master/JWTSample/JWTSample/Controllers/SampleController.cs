@@ -1,5 +1,6 @@
 ﻿using JWTSample.Entities;
 using JWTSample.Models;
+//using JWTSample.ContosoModels;
 using JWTSample.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,14 +35,7 @@ namespace JWTSample.Controllers
 
         [HttpGet]
         public IActionResult GetSummaries() => Ok(Summaries);
-
-
-        [HttpGet]
-        public IActionResult GetAcikKapiBasvuru()
-        {
-            AçıkKapıSosyalHizmetBaş1 item = _userService.getBasvuruByID(3);
-            return Ok(item);
-        }
+       
 
         [HttpGet]
         public IActionResult GetUserList()
