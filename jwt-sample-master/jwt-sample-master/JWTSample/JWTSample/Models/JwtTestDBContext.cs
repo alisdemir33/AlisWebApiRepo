@@ -15,7 +15,6 @@ namespace JWTSample.Models
         {
         }
 
-        public virtual DbSet<AçıkKapıSosyalHizmetBaş1> AçıkKapıSosyalHizmetBaş1 { get; set; }
         public virtual DbSet<County> County { get; set; }
         public virtual DbSet<Foundation> Foundation { get; set; }
         public virtual DbSet<Province> Province { get; set; }
@@ -32,11 +31,6 @@ namespace JWTSample.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AçıkKapıSosyalHizmetBaş1>(entity =>
-            {
-                entity.HasNoKey();
-            });
-
             modelBuilder.Entity<County>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();

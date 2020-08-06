@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Collections.Generic;
 using JWTSample.ViewModels;
 using JWTSample.ContosoModels;
+using JWTSample.Auth;
 //using Users = JWTSample.ContosoModels.Users;
 
 namespace JWTSample.Services.User
@@ -30,16 +31,34 @@ namespace JWTSample.Services.User
         }
 
         //Ekstra bir DTO veya model oluşturmamak için şimdilik değerlerimi geriye tuple olarak dönüyorum.
-        public (string username, string token)? Authenticate(string username, string password)
+        // public (string username, string token)? Authenticate(string username, string password)
+        public TokenUser Authenticate(string username, string password)
         {
             //Kullanıcının gerçekten olup olmadığı kontrol ediyorum yoksa direk null dönüyorum.
-            var user = _dbContext.Users.SingleOrDefault(x => x.UserName == username && x.Password == password);
+            var dbUser = _dbContext.Users.SingleOrDefault(x => x.UserName == username && x.Password == password);
 
-            if (user == null)
+            if (dbUser == null)
                 return null;
 
+           Auth.User user = new Auth.User() { Email=dbUser.UserName, Id=dbUser.Id,Name=dbUser.Name,Password= dbUser.Password,Surname=dbUser.Surname  };
+
+            MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
+            Token token = tokenHandler.CreateAccessToken(user);
+
+            //Refresh token Users tablosuna işleniyor.
+            dbUser.RefreshToken = token.RefreshToken;
+            dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
+            user.RefreshToken = token.RefreshToken;
+            user.RefreshTokenEndDate = dbUser.RefreshTokenEndDate;
+
+            _dbContext.SaveChanges();
+
+            return new TokenUser() { Token= token, User=user };
+
+            /*   İlk Versiyon(REfresh TOKEN olmayan)
+
             // Token oluşturmak için önce JwtSecurityTokenHandler sınıfından instance alıyorum.
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var _tokenHandler = new JwtSecurityTokenHandler();
             //İmza için gerekli gizli anahtarımı alıyorum.
             var key = Encoding.ASCII.GetBytes(_appSettings.SecretKey);
 
@@ -50,7 +69,7 @@ namespace JWTSample.Services.User
                 {
                     //İstersek string bir property istersek ClaimsTypes sınıfının sabitlerinden çağırabiliriz.
                     new Claim("userId", user.Id.ToString()),
-                    new Claim(ClaimTypes.Name,user.UserName),
+                    new Claim(ClaimTypes.Name,user.Email),
                     new Claim("Name",user.Name),
                     new Claim("Surname",user.Surname)
                 }),
@@ -60,14 +79,35 @@ namespace JWTSample.Services.User
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             //Token oluşturuyoruz.
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var _token = _tokenHandler.CreateToken(tokenDescriptor);
             //Oluşturduğumuz tokenı string olarak bir değişkene atıyoruz.
-            string generatedToken = tokenHandler.WriteToken(token);
+            string generatedToken = _tokenHandler.WriteToken(_token);
 
            // Sonuçlarımızı tuple olarak dönüyoruz.
-              return (user.UserName, generatedToken);
+              return (user.Email, generatedToken);
             // return ("", "");
+
+            */
         }
+
+       
+        //public TokenUser RefreshTokenLogin(string refreshToken)
+        //{
+        //    User user = await _context.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+        //    if (user != null && user?.RefreshTokenEndDate > DateTime.Now)
+        //    {
+        //        TokenHandler tokenHandler = new TokenHandler(_configuration);
+        //        TokenAuthentication.Models.Token token = tokenHandler.CreateAccessToken(user);
+
+        //        user.RefreshToken = token.RefreshToken;
+        //        user.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
+        //        await _context.SaveChangesAsync();
+
+        //        return token;
+        //    }
+        //    return null;
+        //}
+
 
         public Ingredients GetIngredients()
         {

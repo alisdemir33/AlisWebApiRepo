@@ -23,5 +23,9 @@ namespace JWTSample.Models
         [Column("TCKN")]
         [StringLength(11)]
         public string Tckn { get; set; }
+        [StringLength(500)]
+        public string RefreshToken { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? RefreshTokenEndDate { get; set; }
     }
 }

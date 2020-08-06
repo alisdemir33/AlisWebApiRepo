@@ -25,12 +25,15 @@ namespace JWTSample.Controllers
         [HttpPost]
         public IActionResult Authenticate([FromBody] AuthenticateModel authenticateModel)
         {
-            var user = _userService.Authenticate(authenticateModel.Username, authenticateModel.Password);
+            var tokenUser = _userService.Authenticate(authenticateModel.Username, authenticateModel.Password);
 
-            if (user == null)
+            if (tokenUser == null)
                 return BadRequest("Username or password incorrect!");
 
-            return Ok(new { Username = user.Value.username, Token = user.Value.token });
+            return Ok(tokenUser);
+
+            //return Ok(new { Username = user.Value.username, Token = user.Value.token });
+
         }
 
         [HttpGet]
