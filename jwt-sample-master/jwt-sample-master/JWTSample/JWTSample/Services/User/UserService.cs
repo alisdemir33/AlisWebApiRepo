@@ -43,11 +43,11 @@ namespace JWTSample.Services.User
            Auth.User user = new Auth.User() { Email=dbUser.UserName, Id=dbUser.Id,Name=dbUser.Name,Password= dbUser.Password,Surname=dbUser.Surname  };
 
             MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
-            Token token = tokenHandler.CreateAccessToken(user);
+            Token token = tokenHandler.CreateAccessToken();
 
             //Refresh token Users tablosuna işleniyor.
             dbUser.RefreshToken = token.RefreshToken;
-            dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
+            dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(1);
             user.RefreshToken = token.RefreshToken;
             user.RefreshTokenEndDate = dbUser.RefreshTokenEndDate;
 
@@ -55,7 +55,9 @@ namespace JWTSample.Services.User
 
             return new TokenUser() { Token= token, User=user };
 
-            /*   İlk Versiyon(REfresh TOKEN olmayan)
+            #region original
+            /*   
+             *   İlk Versiyon(REfresh TOKEN olmayan)
 
             // Token oluşturmak için önce JwtSecurityTokenHandler sınıfından instance alıyorum.
             var _tokenHandler = new JwtSecurityTokenHandler();
@@ -88,25 +90,28 @@ namespace JWTSample.Services.User
             // return ("", "");
 
             */
+            #endregion
         }
 
-       
-        //public TokenUser RefreshTokenLogin(string refreshToken)
-        //{
-        //    User user = await _context.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
-        //    if (user != null && user?.RefreshTokenEndDate > DateTime.Now)
-        //    {
-        //        TokenHandler tokenHandler = new TokenHandler(_configuration);
-        //        TokenAuthentication.Models.Token token = tokenHandler.CreateAccessToken(user);
 
-        //        user.RefreshToken = token.RefreshToken;
-        //        user.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
-        //        await _context.SaveChangesAsync();
+        public TokenUser RefreshTokenLogin(string refreshToken)
+        {
+            Models.Users dbUser = _dbContext.Users.FirstOrDefault(x => x.RefreshToken == refreshToken);
+            if (dbUser != null && dbUser?.RefreshTokenEndDate > DateTime.Now)
+            {
+                MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
+                Token token = tokenHandler.CreateAccessToken();
 
-        //        return token;
-        //    }
-        //    return null;
-        //}
+                dbUser.RefreshToken = token.RefreshToken;
+                dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
+                 _dbContext.SaveChanges();
+
+                Auth.User user = new Auth.User() { Email = dbUser.UserName, Id = dbUser.Id, Name = dbUser.Name, Password = dbUser.Password, Surname = dbUser.Surname };
+
+                return new TokenUser() { Token = token, User = user };
+            }
+            return null;
+        }
 
 
         public Ingredients GetIngredients()

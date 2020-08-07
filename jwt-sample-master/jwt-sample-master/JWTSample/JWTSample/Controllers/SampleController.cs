@@ -36,6 +36,23 @@ namespace JWTSample.Controllers
 
         }
 
+
+        [HttpPost]
+        public IActionResult RefreshToken([FromBody] string  refreshToken)
+        {
+            var tokenUser = _userService.RefreshTokenLogin(refreshToken);
+
+            if (tokenUser == null)
+                return BadRequest("Invalid Cred!");
+
+            return Ok(tokenUser);           
+
+        }
+
+
+
+
+
         [HttpGet]
         public IActionResult GetSummaries() => Ok(Summaries);
        

@@ -23,7 +23,7 @@ namespace JWTSample.Auth
 
         }
         //Token üretecek metot.
-        public Token CreateAccessToken(User user)
+        public Token CreateAccessToken()
         {
             Token tokenInstance = new Token();
 
