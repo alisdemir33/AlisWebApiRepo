@@ -10,6 +10,7 @@ namespace JWTSample.Services.User
     {
         // (string username, string token)? Authenticate(string username, string password);     
         TokenUser Authenticate(string username, string password);
+        TokenUser IlanAuthenticate(string username, string password);
         TokenUser RefreshTokenLogin(string refreshTokend);
         List<Users> getUserList();
         Ingredients GetIngredients();

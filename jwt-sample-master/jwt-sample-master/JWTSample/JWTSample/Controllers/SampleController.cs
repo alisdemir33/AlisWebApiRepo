@@ -25,7 +25,8 @@ namespace JWTSample.Controllers
         [HttpPost]
         public IActionResult Authenticate([FromBody] AuthenticateModel authenticateModel)
         {
-            var tokenUser = _userService.Authenticate(authenticateModel.Username, authenticateModel.Password);
+            //var tokenUser = _userService.Authenticate(authenticateModel.Username, authenticateModel.Password);
+            var tokenUser = _userService.IlanAuthenticate(authenticateModel.Username, authenticateModel.Password);
 
             if (tokenUser == null)
                 return BadRequest("Username or password incorrect!");
@@ -36,11 +37,11 @@ namespace JWTSample.Controllers
 
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
-        public IActionResult RefreshToken([FromBody] string  refreshToken)
+        public IActionResult RefreshToken([FromBody] RefreshTokenEntity refreshToken)
         {
-            var tokenUser = _userService.RefreshTokenLogin(refreshToken);
+            var tokenUser = _userService.RefreshTokenLogin(refreshToken.RefreshToken);
 
             if (tokenUser == null)
                 return BadRequest("Invalid Cred!");

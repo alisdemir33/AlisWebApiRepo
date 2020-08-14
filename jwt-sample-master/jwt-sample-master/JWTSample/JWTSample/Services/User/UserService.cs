@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using JWTSample.ViewModels;
 using JWTSample.ContosoModels;
 using JWTSample.Auth;
+using VakifIlan;
+using System.Configuration;
 //using Users = JWTSample.ContosoModels.Users;
 
 namespace JWTSample.Services.User
@@ -22,9 +24,9 @@ namespace JWTSample.Services.User
     {
         private readonly AppSettings _appSettings;
         private readonly JwtTestDBContext _dbContext;
-       // private readonly CONTOSOContext _dbContext;
+        // private readonly CONTOSOContext _dbContext;
         public UserService(IOptions<AppSettings> appSettings, JwtTestDBContext dbContext)
-     //   public UserService(IOptions<AppSettings> appSettings, CONTOSOContext dbContext)
+        //   public UserService(IOptions<AppSettings> appSettings, CONTOSOContext dbContext)
         {
             _dbContext = dbContext;
             _appSettings = appSettings.Value;
@@ -40,20 +42,22 @@ namespace JWTSample.Services.User
             if (dbUser == null)
                 return null;
 
-           Auth.User user = new Auth.User() { Email=dbUser.UserName, Id=dbUser.Id,Name=dbUser.Name,Password= dbUser.Password,Surname=dbUser.Surname  };
+            Auth.User user = new Auth.User() { Email = dbUser.UserName, Id = dbUser.Id, Name = dbUser.Name, Password = dbUser.Password, Surname = dbUser.Surname };
 
             MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
             Token token = tokenHandler.CreateAccessToken();
 
+            //_appSettings.
+
             //Refresh token Users tablosuna işleniyor.
             dbUser.RefreshToken = token.RefreshToken;
-            dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(1);
+            dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(5);
             user.RefreshToken = token.RefreshToken;
             user.RefreshTokenEndDate = dbUser.RefreshTokenEndDate;
 
             _dbContext.SaveChanges();
 
-            return new TokenUser() { Token= token, User=user };
+            return new TokenUser() { Token = token, User = user };
 
             #region original
             /*   
@@ -94,21 +98,111 @@ namespace JWTSample.Services.User
         }
 
 
+
+        public TokenUser IlanAuthenticate(string username, string password)
+        {
+            
+
+           // var appSettingsSection = Configuration.GetSection("AppSettings");
+           // services.Configure<AppSettings>(appSettingsSection);
+
+            // Oluşturduğumuz gizli anahtarımızı byte dizisi olarak alıyoruz.
+           // var appSettings = appSettingsSection.Get<AppSettings>();
+          
+        //    var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
+
+            VakifDb db = new VakifDb();
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                throw new Exception("Kullanıcı Adı ve Şifre Boş Olamaz!");
+            }
+
+            if (Util.TcKontrol(username))
+            {
+                var sonuc = db.GetKullanici(username, password);
+                if (sonuc.BasariliMi)
+                {
+
+                    Auth.User user = new Auth.User()
+                    {
+                        Email = sonuc.Veri.Rows[0]["EPosta"].ToString(),
+                        ApplicantID = int.Parse(sonuc.Veri.Rows[0]["ID"].ToString()),
+                        Name = sonuc.Veri.Rows[0]["Adi"].ToString(),
+                        Surname = sonuc.Veri.Rows[0]["Soyadi"].ToString()
+                    };
+
+                    MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
+                    Token token = tokenHandler.CreateAccessToken();
+
+                    return new TokenUser() { Token = token, User = user };
+
+                }
+                else
+                {
+                    throw new Exception("Bağlantı Hatası!");
+                }
+
+            }
+            else
+
+                throw new Exception("Kullanıcı Bulunamadı!");
+
+        }
+
+
+        public TokenUser IlanRefreshTokenLogin(string refreshToken, int applicantId)
+        {
+            if (refreshToken != null)
+            {
+                VakifDb db = new VakifDb();
+
+                var sonuc = db.CheckRefreshToken(refreshToken);
+
+                if (sonuc.Veri.Rows.Count > 0 && (DateTime)(sonuc.Veri.Rows[0]["RefreshTokenEndDate"]) > DateTime.Now)
+                {
+
+                    MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
+                    Token token = tokenHandler.CreateAccessToken();
+
+                    db.SetRefreshToken(token.RefreshToken, applicantId.ToString());
+
+                    Auth.User user = new Auth.User()
+                    {
+                        Email = sonuc.Veri.Rows[0]["EPosta"].ToString(),
+                        ApplicantID = int.Parse(sonuc.Veri.Rows[0]["ID"].ToString()),
+                        Name = sonuc.Veri.Rows[0]["Adi"].ToString(),
+                        Surname = sonuc.Veri.Rows[0]["Soyadi"].ToString()
+                    };
+
+                    return new TokenUser() { Token = token, User = user };
+                }
+                else {
+                    throw new Exception("Refresh token Süresi Doldu!");
+                }
+            }
+            else {
+                throw new Exception("RefreshToken boş olamaz!");
+            }
+        }
+
         public TokenUser RefreshTokenLogin(string refreshToken)
         {
-            Models.Users dbUser = _dbContext.Users.FirstOrDefault(x => x.RefreshToken == refreshToken);
-            if (dbUser != null && dbUser?.RefreshTokenEndDate > DateTime.Now)
+            if (refreshToken != null)
             {
-                MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
-                Token token = tokenHandler.CreateAccessToken();
+                Models.Users dbUser = _dbContext.Users.FirstOrDefault(x => x.RefreshToken == refreshToken);
+                if (dbUser != null && dbUser?.RefreshTokenEndDate > DateTime.Now)
+                {
+                    MyTokenHandler tokenHandler = new MyTokenHandler(_appSettings);
+                    Token token = tokenHandler.CreateAccessToken();
 
-                dbUser.RefreshToken = token.RefreshToken;
-                dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(3);
-                 _dbContext.SaveChanges();
+                    dbUser.RefreshToken = token.RefreshToken;
+                    dbUser.RefreshTokenEndDate = token.Expiration.AddMinutes(5);
+                    _dbContext.SaveChanges();
 
-                Auth.User user = new Auth.User() { Email = dbUser.UserName, Id = dbUser.Id, Name = dbUser.Name, Password = dbUser.Password, Surname = dbUser.Surname };
+                    Auth.User user = new Auth.User() { Email = dbUser.UserName, Id = dbUser.Id, Name = dbUser.Name, Password = dbUser.Password, Surname = dbUser.Surname };
 
-                return new TokenUser() { Token = token, User = user };
+                    return new TokenUser() { Token = token, User = user };
+                }
             }
             return null;
         }
@@ -123,7 +217,7 @@ namespace JWTSample.Services.User
         {
             List<Models.Users> items = _dbContext.Users.ToList();// AçıkKapıSosyalHizmetBaş1.Where(item => item.Id == id.ToString()).FirstOrDefault();
             return items;
-          
+
         }
 
         public List<Order> GetOrders()

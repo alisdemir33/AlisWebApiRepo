@@ -30,6 +30,8 @@ namespace JWTSample.Auth
             //Security  Key'in simetriğini alıyoruz.
             var key = Encoding.ASCII.GetBytes(_appSettings.SecretKey);
 
+            
+
             //SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Token:SecurityKey"]));
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
 
@@ -43,7 +45,7 @@ namespace JWTSample.Auth
                 //audience: Configuration["Token:Audience"],
                 expires: tokenInstance.Expiration,//Token süresini 5 dk olarak belirliyorum
                 notBefore: DateTime.Now,//Token üretildikten ne kadar süre sonra devreye girsin ayarlıyouz.
-                signingCredentials: signingCredentials
+                signingCredentials: signingCredentials               
                 );
 
             //Token oluşturucu sınıfında bir örnek alıyoruz.

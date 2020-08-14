@@ -9,7 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
+
 
 namespace JWTSample
 {
@@ -24,6 +26,7 @@ namespace JWTSample
             //Atacağımız isteklerde CORS problemi yaşamamak için:
             services.AddCors();
             services.AddControllers();
+  
             //Projemizde DbContext olarak ApplicationDbContext kullanacağımız belirtliyoruz.
             services.AddDbContext<JwtTestDBContext>();
             // appsettings.json içinde oluşturduğumuz gizli anahtarımızı AppSettings ile çağıracağımızı söylüyoruz.
@@ -56,7 +59,8 @@ namespace JWTSample
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         //Bu iki ayar ise "aud" ve "iss" claimlerini kontrol edelim mi diye soruyor
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        ClockSkew=TimeSpan.Zero
                     };
                 });
             //DI için IUserService arayüzünü çağırdığım zaman UserService sınıfını getirmesini söylüyorum.

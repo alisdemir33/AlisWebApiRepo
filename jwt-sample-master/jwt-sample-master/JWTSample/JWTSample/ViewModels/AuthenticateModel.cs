@@ -11,4 +11,11 @@ namespace JWTSample
         [Required]
         public string Password { get; set; }
     }
+
+
+    public class RefreshTokenEntity {
+        private string refreshToken;
+
+        public string RefreshToken { get => refreshToken; set => refreshToken = value; }
+    }
 }
